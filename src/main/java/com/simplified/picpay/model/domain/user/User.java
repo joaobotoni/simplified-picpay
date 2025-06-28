@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class User {
     @Id
@@ -19,7 +20,7 @@ public class User {
     private String firstName;
     private String lastName;
     @Column(unique = true)
-    private String CPF;
+    private String cpf;
     @Column(unique = true)
     private String email;
     private String password;
