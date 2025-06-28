@@ -29,9 +29,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<UserDTO>> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
         try {
-            Optional<UserDTO> user = service.getUserById(id);
+            UserDTO user = service.getUserDtoById(id);
             return ResponseEntity.ok(user);
         } catch (RuntimeException e) {
             ResponseEntity.badRequest().build();
