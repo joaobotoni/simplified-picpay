@@ -1,6 +1,7 @@
 package com.simplified.picpay.service;
 
 import com.simplified.picpay.model.domain.user.User;
+import com.simplified.picpay.model.dto.user.UserDTO;
 import com.simplified.picpay.model.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,12 +16,21 @@ public class UserService {
     @Autowired
     private UserRepository repository;
 
-    public List<User> getAll() {
-        return repository.findAll();
+    public List<UserDTO> getAll() {
+        return repository.findAll().stream()
+                .map(user -> new UserDTO(
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getEmail(),
+                        user.getBalance())).toList();
     }
 
-    public Optional<User> getUserById(Long id) {
-        return repository.findById(id);
+    public Optional<UserDTO> getUserById(Long id) {
+        return repository.findById(id).map(user -> new UserDTO(
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getBalance()));
     }
 
     public void create(User user) {

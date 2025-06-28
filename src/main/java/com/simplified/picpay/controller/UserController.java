@@ -1,8 +1,8 @@
 package com.simplified.picpay.controller;
 
 import com.simplified.picpay.model.domain.user.User;
+import com.simplified.picpay.model.dto.user.UserDTO;
 import com.simplified.picpay.service.UserService;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +18,9 @@ public class UserController {
     private UserService service;
 
     @GetMapping
-    public ResponseEntity<List<User>> getAll() {
+    public ResponseEntity<List<UserDTO>> getAll() {
         try {
-            List<User> user = service.getAll();
+            List<UserDTO> user = service.getAll();
             return ResponseEntity.ok(user);
         } catch (RuntimeException e) {
             ResponseEntity.badRequest().build();
@@ -29,9 +29,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<User>> getUserById(@PathVariable Long id) {
+    public ResponseEntity<Optional<UserDTO>> getUserById(@PathVariable Long id) {
         try {
-            Optional<User> user = service.getUserById(id);
+            Optional<UserDTO> user = service.getUserById(id);
             return ResponseEntity.ok(user);
         } catch (RuntimeException e) {
             ResponseEntity.badRequest().build();
