@@ -7,10 +7,9 @@ import com.simplified.picpay.model.repository.TransactionRepository;
 import com.simplified.picpay.rest.AuthorizationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,15 +24,15 @@ public class TransactionService {
     private TransactionRepository repository;
 
     @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
-    private AuthorizationResponse auth;
+    private WebClient webClient;
 
     @Value("${util.auth.transaction.api.url}")
     private String url;
 
-    private void transaction(TransactionDTO transaction) {
+    @Autowired
+    private NotificationService notificationService;
+
+    public Transaction createTransaction(TransactionDTO transaction) {
         User sender = service.getUserById(transaction.senderId());
         User receiver = service.getUserById(transaction.receiverId());
 
@@ -56,18 +55,31 @@ public class TransactionService {
         this.repository.save(newTransaction);
         this.service.save(sender);
         this.service.save(receiver);
+
+//        this.notificationService.sendNotification(sender,"Transaçao realizada com sucesso ");
+//        this.notificationService.sendNotification(receiver,"Transaçao recebida com sucesso ");
+
+        return newTransaction;
     }
 
     public boolean authorizeTransaction(User sender, BigDecimal value) {
-        ResponseEntity<AuthorizationResponse> response = restTemplate.getForEntity(url, AuthorizationResponse.class);
+        try {
+            ResponseEntity<AuthorizationResponse> responseEntity = webClient
+                    .get()
+                    .uri(url)
+                    .exchangeToMono(response -> response.toEntity(AuthorizationResponse.class))
+                    .block();
 
-        if (response.getStatusCode() == HttpStatus.OK) {
-            AuthorizationResponse authorizationResponse = response.getBody();
-            if (authorizationResponse != null && "success".equals(authorizationResponse.status())) {
-                return authorizationResponse.data().authorization();
-            }
+            AuthorizationResponse authorizationResponse = responseEntity != null ? responseEntity.getBody() : null;
+
+            return authorizationResponse != null
+                    && "success".equalsIgnoreCase(authorizationResponse.status())
+                    && authorizationResponse.data() != null
+                    && authorizationResponse.data().authorization();
+
+        } catch (Exception e) {
+            System.err.println("Erro ao autorizar transação: " + e.getMessage());
+            return false;
         }
-        return false;
     }
-
 }
