@@ -39,7 +39,7 @@ public class UserService {
         return this.repository.findById(id).orElseThrow(() -> new RuntimeException("User notfound"));
     }
 
-    public void create(User user) {
+    public void save(User user) {
         this.repository.save(user);
     }
 

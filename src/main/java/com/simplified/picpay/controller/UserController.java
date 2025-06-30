@@ -42,7 +42,7 @@ public class UserController {
     @PostMapping("/create")
     public ResponseEntity<Void> create(@RequestBody User user) {
         try {
-            service.create(user);
+            service.save(user);
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             ResponseEntity.badRequest().build();
