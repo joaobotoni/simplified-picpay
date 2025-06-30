@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 
 @Service
@@ -32,35 +33,29 @@ public class TransactionService {
     @Autowired
     private NotificationService notificationService;
 
-    public Transaction createTransaction(TransactionDTO transaction) {
-        User sender = service.getUserById(transaction.senderId());
-        User receiver = service.getUserById(transaction.receiverId());
+    public Transaction createTransaction(TransactionDTO dto) throws AccessDeniedException {
+        User sender = service.getUserById(dto.senderId());
+        User receiver = service.getUserById(dto.receiverId());
 
-        service.validateTransaction(sender, transaction.value());
-        boolean isAuthorized = this.authorizeTransaction(sender, transaction.value());
+        service.validateTransaction(sender, dto.value());
 
-        if (!isAuthorized) {
-            throw new RuntimeException("Unauthorized transaction");
+        if (!authorizeTransaction(sender, dto.value())) {
+            throw new AccessDeniedException("Transação não autorizada");
         }
 
-        Transaction newTransaction = new Transaction();
-        newTransaction.setAmount(transaction.value());
-        newTransaction.setSender(sender);
-        newTransaction.setReceiver(receiver);
-        newTransaction.setTime(LocalDateTime.now());
+        Transaction transaction = buildTransaction(sender, receiver, dto.value());
 
-        sender.setBalance(sender.getBalance().subtract(transaction.value()));
-        receiver.setBalance(receiver.getBalance().add(transaction.value()));
+        updateUserBalances(sender, receiver, dto.value());
 
-        this.repository.save(newTransaction);
-        this.service.save(sender);
-        this.service.save(receiver);
+        repository.save(transaction);
+        service.save(sender);
+        service.save(receiver);
 
-        this.notificationService.sendNotification(sender, "Transaction completed successfully");
-        this.notificationService.sendNotification(receiver, "Transaction received successfully");
+        notifyUsers(sender, receiver);
 
-        return newTransaction;
+        return transaction;
     }
+
 
     public boolean authorizeTransaction(User sender, BigDecimal value) {
 
@@ -77,4 +72,24 @@ public class TransactionService {
                 && authorizationResponse.data() != null
                 && authorizationResponse.data().authorization();
     }
+
+    private Transaction buildTransaction(User sender, User receiver, BigDecimal value) {
+        Transaction tx = new Transaction();
+        tx.setSender(sender);
+        tx.setReceiver(receiver);
+        tx.setAmount(value);
+        tx.setTime(LocalDateTime.now());
+        return tx;
+    }
+
+    private void updateUserBalances(User sender, User receiver, BigDecimal value) {
+        sender.setBalance(sender.getBalance().subtract(value));
+        receiver.setBalance(receiver.getBalance().add(value));
+    }
+
+    private void notifyUsers(User sender, User receiver) {
+        notificationService.sendNotification(sender, "Transaction completed successfully");
+        notificationService.sendNotification(receiver, "Transaction received successfully");
+    }
+
 }
