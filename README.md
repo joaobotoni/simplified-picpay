@@ -40,16 +40,17 @@ A aplicação permite:
 ```
 src/main/
 ├── java/com/simplified/picpay
-│   ├── configuration/          # Configurações (beans, WebClient)
-│   ├── controller/             # Rest controllers
+│   ├── configuration/            # Configurações gerais (WebClient, beans, tratadores de exceção com @RestControllerAdvice)
+│   ├── controller/               # Controladores REST (endpoints públicos da aplicação)
 │   ├── model/
-│   │   ├── domain/             # Entidades JPA (User, Transaction)
-│   │   ├── dto/                # Objeto de Transferência de Dados
-│   │   └── mapper/             # Mapeamento entre entidade e DTO
-│   ├── repository/             # Interfaces Spring Data JPA
-│   └── service/                # Lógica de negócio
+│   │   ├── domain/               # Entidades JPA (User, Transaction, etc.)
+│   │   ├── dto/                  # DTOs para entrada e saída (UserDTO, TransactionDTO, etc.)
+│   │   ├── mapper/               # Conversão entre DTOs e entidades com MapStruct ou manualmente
+│   │   └── repository/           # Interfaces JPA do Spring Data (UserRepository, TransactionRepository, etc.)
+│   ├── rest/                     # Entidades para comunicação com APIs externas (AuthorizationClient)
+│   └── service/                  # Lógica de negócio da aplicação (TransactionService, UserService, etc.)
 └── resources/
-    └── application.properties  # Configurações de ambiente
+    ├── application.properties    # Arquivo de configuração da aplicação
 ```
 
 ## Entidades e DTOs
