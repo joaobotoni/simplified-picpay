@@ -44,7 +44,6 @@ public class TransactionService {
         }
 
         Transaction transaction = buildTransaction(sender, receiver, dto.value());
-
         updateUserBalances(sender, receiver, dto.value());
 
         repository.save(transaction);
