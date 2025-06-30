@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -20,44 +19,40 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAll() {
         try {
-            List<UserDTO> user = service.getAll();
-            return ResponseEntity.ok(user);
+            List<UserDTO> users = service.getAll();
+            return ResponseEntity.ok(users);
         } catch (RuntimeException e) {
-            ResponseEntity.badRequest().build();
-            throw new RuntimeException(e);
+            return ResponseEntity.badRequest().body(null);
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
         try {
             UserDTO user = service.getUserDtoById(id);
             return ResponseEntity.ok(user);
         } catch (RuntimeException e) {
-            ResponseEntity.badRequest().build();
-            throw new RuntimeException(e);
+            return ResponseEntity.status(404).body("Usuário não encontrado com ID: " + id);
         }
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Void> create(@RequestBody User user) {
+    public ResponseEntity<?> create(@RequestBody User user) {
         try {
             service.save(user);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.status(201).body("Usuário criado com sucesso");
         } catch (RuntimeException e) {
-            ResponseEntity.badRequest().build();
-            throw new RuntimeException(e);
+            return ResponseEntity.badRequest().body("Erro ao criar usuário: " + e.getMessage());
         }
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         try {
             service.delete(id);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok("Usuário deletado com sucesso");
         } catch (RuntimeException e) {
-            ResponseEntity.badRequest().build();
-            throw new RuntimeException(e);
+            return ResponseEntity.badRequest().body("Erro ao deletar usuário: " + e.getMessage());
         }
     }
 }
