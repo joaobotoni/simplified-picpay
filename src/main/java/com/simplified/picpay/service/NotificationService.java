@@ -4,8 +4,6 @@ import com.simplified.picpay.model.domain.user.User;
 import com.simplified.picpay.model.dto.notification.NotificationDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
