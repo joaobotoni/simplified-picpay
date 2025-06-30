@@ -21,20 +21,19 @@ public class NotificationService {
         NotificationDTO notification = new NotificationDTO(user.getEmail(), message);
 
         try {
-            ResponseEntity<String> response = webClient.post()
-                    .uri(url)
-                    .bodyValue(notification)
-                    .exchangeToMono(resp -> resp.toEntity(String.class))
-                    .block();
-
-            if (response == null || !response.getStatusCode().equals(HttpStatus.OK)) {
-                System.out.println("Erro ao enviar mensagem");
-                throw new RuntimeException("Serviço de notificação está fora do ar");
-            }
+//            ResponseEntity<String> response = webClient.post()
+//                    .uri(url)
+//                    .bodyValue(notification)
+//                    .exchangeToMono(resp -> resp.toEntity(String.class))
+//                    .block();
+//
+//            if (response == null || !response.getStatusCode().equals(HttpStatus.OK)) {
+//                System.out.println("Erro ao enviar mensagem");
+//                throw new RuntimeException("Serviço de notificação está fora do ar");
+//            }
+            System.out.print("Transaction completed successfully");
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
     }
-
-
 }

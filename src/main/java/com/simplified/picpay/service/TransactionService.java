@@ -40,7 +40,7 @@ public class TransactionService {
         boolean isAuthorized = this.authorizeTransaction(sender, transaction.value());
 
         if (!isAuthorized) {
-            throw new RuntimeException("Transação não autorizada");
+            throw new RuntimeException("Unauthorized transaction");
         }
 
         Transaction newTransaction = new Transaction();
@@ -56,30 +56,25 @@ public class TransactionService {
         this.service.save(sender);
         this.service.save(receiver);
 
-//        this.notificationService.sendNotification(sender,"Transaçao realizada com sucesso ");
-//        this.notificationService.sendNotification(receiver,"Transaçao recebida com sucesso ");
+        this.notificationService.sendNotification(sender, "Transaction completed successfully");
+        this.notificationService.sendNotification(receiver, "Transaction received successfully");
 
         return newTransaction;
     }
 
     public boolean authorizeTransaction(User sender, BigDecimal value) {
-        try {
-            ResponseEntity<AuthorizationResponse> responseEntity = webClient
-                    .get()
-                    .uri(url)
-                    .exchangeToMono(response -> response.toEntity(AuthorizationResponse.class))
-                    .block();
 
-            AuthorizationResponse authorizationResponse = responseEntity != null ? responseEntity.getBody() : null;
+        ResponseEntity<AuthorizationResponse> responseEntity = webClient
+                .get()
+                .uri(url)
+                .exchangeToMono(response -> response.toEntity(AuthorizationResponse.class))
+                .block();
 
-            return authorizationResponse != null
-                    && "success".equalsIgnoreCase(authorizationResponse.status())
-                    && authorizationResponse.data() != null
-                    && authorizationResponse.data().authorization();
+        AuthorizationResponse authorizationResponse = responseEntity != null ? responseEntity.getBody() : null;
 
-        } catch (Exception e) {
-            System.err.println("Erro ao autorizar transação: " + e.getMessage());
-            return false;
-        }
+        return authorizationResponse != null
+                && "success".equalsIgnoreCase(authorizationResponse.status())
+                && authorizationResponse.data() != null
+                && authorizationResponse.data().authorization();
     }
 }

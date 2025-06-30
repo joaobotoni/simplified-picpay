@@ -1,15 +1,14 @@
 package com.simplified.picpay.controller;
 
+import org.springframework.http.ResponseEntity;
 import com.simplified.picpay.model.domain.transaction.Transaction;
 import com.simplified.picpay.model.dto.transaction.TransactionDTO;
 import com.simplified.picpay.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/transactions")
@@ -19,19 +18,8 @@ public class TransactionController {
     private TransactionService service;
 
     @PostMapping("/new-transaction")
-    public ResponseEntity<?> transaction(@RequestBody TransactionDTO transactionDTO) {
-        try {
-            Transaction newTransaction = service.createTransaction(transactionDTO);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "✅ Transação realizada com sucesso!");
-            response.put("transaction", newTransaction);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (RuntimeException e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", "❌ Erro ao processar transação: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
+    public ResponseEntity<Transaction> transaction(@RequestBody TransactionDTO transactionDTO) {
+        Transaction newTransaction = service.createTransaction(transactionDTO);
+        return ResponseEntity.status(202).body(newTransaction);
     }
 }

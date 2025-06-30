@@ -18,41 +18,25 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAll() {
-        try {
-            List<UserDTO> users = service.getAll();
-            return ResponseEntity.ok(users);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+        List<UserDTO> users = service.getAll();
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        try {
-            UserDTO user = service.getUserDtoById(id);
-            return ResponseEntity.ok(user);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body("Usuário não encontrado com ID: " + id);
-        }
+        UserDTO user = service.getUserDtoById(id);
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody User user) {
-        try {
-            service.save(user);
-            return ResponseEntity.status(201).body("Usuário criado com sucesso");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body("Erro ao criar usuário: " + e.getMessage());
-        }
+        service.save(user);
+        return ResponseEntity.status(201).body("User created successfully");
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
-        try {
-            service.delete(id);
-            return ResponseEntity.ok("Usuário deletado com sucesso");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body("Erro ao deletar usuário: " + e.getMessage());
-        }
+        service.delete(id);
+        return ResponseEntity.ok("User deleted successfully");
     }
 }

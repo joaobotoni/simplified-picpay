@@ -34,9 +34,8 @@ public class UserService {
                 user.getBalance())).orElseThrow(RuntimeException::new);
     }
 
-
     public User getUserById(Long id) {
-        return this.repository.findById(id).orElseThrow(() -> new RuntimeException("User notfound"));
+        return this.repository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     public void save(User user) {
@@ -48,12 +47,12 @@ public class UserService {
     }
 
 
-        public void validateTransaction(User sender, BigDecimal balance){
-        if(sender.getUserType() == UserType.MERCHANT){
-            throw new RuntimeException("Esse tipo de usuario não está autorizado a fazer transação");
+    public void validateTransaction(User sender, BigDecimal balance) {
+        if (sender.getUserType() == UserType.MERCHANT) {
+            throw new RuntimeException("This type of user is not authorized to make transactions.");
         }
-        if(sender.getBalance().compareTo(balance) < 0){
-            throw new RuntimeException("Saldo insuficiente");
+        if (sender.getBalance().compareTo(balance) < 0) {
+            throw new RuntimeException("Insufficient balance");
         }
     }
 
